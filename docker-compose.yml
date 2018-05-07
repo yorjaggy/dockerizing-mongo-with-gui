@@ -1,0 +1,31 @@
+version: '3.2'
+services:
+  mongo-gui-me:
+    image: mongo-express
+    restart: on-failure
+    ports:
+      - "3312:8081"
+    links:
+      - docker_mongo:mongo
+    environment:
+      #This USERNAME and PASSWORD will be the credentials required in the web browser.
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=abc123
+      #This ADMINUSERNAME and ADMINPASSWORD should be the same used in the docker_mongo environment vars
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=abc123
+
+  docker_mongo:
+    deploy:
+      restart_policy:
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    image: mongo
+    volumes:
+      - "$PWD/data_mongo:/data/db/"
+    environment:
+        - MONGO_INITDB_ROOT_USERNAME=admin
+        - MONGO_INITDB_ROOT_PASSWORD=abc123
+    expose:
+      - "27017"
